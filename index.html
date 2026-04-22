@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SimLaplytics v2 — AI Race Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080a0f;--bg2:#0d1117;--bg3:#12181f;--card:#0f1520;--border:#1e2a3a;
+  --red:#ff1744;--blue:#00b4ff;--yellow:#ffd600;--green:#00e676;--orange:#ff6d00;--purple:#d500f9;
+  --text:#e8edf5;--text2:#8899aa;--text3:#445566;
+  --gr:0 0 20px rgba(255,23,68,.5),0 0 40px rgba(255,23,68,.2);
+  --gb:0 0 20px rgba(0,180,255,.5),0 0 40px rgba(0,180,255,.2);
+  --gy:0 0 20px rgba(255,214,0,.5),0 0 40px rgba(255,214,0,.2);
+  --gg:0 0 20px rgba(0,230,118,.5),0 0 40px rgba(0,230,118,.2);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;overflow-x:hidden;cursor:none}
+#f1c{position:fixed;pointer-events:none;z-index:99999;width:48px;height:22px;top:0;left:0;transform:translate(-50%,-50%);filter:drop-shadow(0 0 8px #ff1744)}
+.tdot{position:fixed;pointer-events:none;z-index:99998;width:6px;height:6px;border-radius:50%;background:#ff1744;transform:translate(-50%,-50%);opacity:0;filter:blur(1px)}
+/* LOADER */
+#ldr{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transition:opacity .7s,visibility .7s}
+#ldr.out{opacity:0;visibility:hidden;pointer-events:none}
+.ll{font-family:'Orbitron',sans-serif;font-size:clamp(20px,4vw,34px);font-weight:900;letter-spacing:4px}
+.ll b{color:var(--red)}
+.ls{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--text2);animation:blk 1.2s infinite}
+@keyframes blk{0%,100%{opacity:1}50%{opacity:.2}}
+.ltr{width:min(540px,88vw);height:50px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.lca{position:absolute;bottom:4px;left:-60px;animation:lcr 2.8s ease-in-out infinite}
+@keyframes lcr{0%{left:-60px;opacity:0}8%{opacity:1}92%{opacity:1}100%{left:calc(100% + 60px);opacity:0}}
+.lbw{width:min(540px,88vw)}
+.lbr{height:10px;background:var(--bg3);border-radius:5px;border:1px solid var(--border);overflow:hidden}
+.lf{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--yellow));border-radius:5px;box-shadow:var(--gr);transition:width .25s ease;position:relative}
+.lf::after{content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:var(--yellow);box-shadow:var(--gy)}
+.lr{display:flex;justify-content:space-between;margin-top:5px}
+.lm{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3)}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:54px;background:rgba(8,10,15,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:18px}
+.nl{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;letter-spacing:2px;flex:1}
+.nl b{color:var(--red)}
+.nv{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);margin-left:6px;padding:2px 6px;border:1px solid var(--border);border-radius:2px}
+.np{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text2)}
+.np.lv{border-color:var(--green);color:var(--green);animation:plv 2s infinite}
+@keyframes plv{0%,100%{box-shadow:0 0 0 0 rgba(0,230,118,.3)}50%{box-shadow:0 0 0 4px rgba(0,230,118,.1)}}
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:80px 28px 40px}
+.gbg{position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,.04) 1px,transparent 1px);background-size:60px 60px;animation:gm 18s linear infinite}
+@keyframes gm{from{transform:translateY(0)}to{transform:translateY(60px)}}
+.gv{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 35%,var(--bg) 80%)}
+.sk{position:absolute;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:0;animation:skr 4s ease-in-out infinite}
+@keyframes skr{0%{opacity:0;transform:translateX(-100%)}15%{opacity:.5}85%{opacity:.5}100%{opacity:0;transform:translateX(100%)}}
+.he{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--red);margin-bottom:18px;text-transform:uppercase;position:relative;z-index:1}
+.ht{font-family:'Orbitron',sans-serif;font-size:clamp(28px,6vw,68px);font-weight:900;text-align:center;line-height:1.1;letter-spacing:-1px;margin-bottom:18px;position:relative;z-index:1}
+.ht .ol{color:transparent;-webkit-text-stroke:1px var(--red)}
+.ht .gr{background:linear-gradient(135deg,var(--red),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hs{font-size:17px;color:var(--text2);text-align:center;max-width:480px;margin-bottom:42px;font-weight:500;position:relative;z-index:1}
+.hc{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+.bp{padding:13px 36px;background:var(--red);color:#fff;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;border:none;cursor:none;clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,11px 100%,0 calc(100% - 11px));transition:all .2s;box-shadow:var(--gr);position:relative;overflow:hidden}
+.bp:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);transform:translateX(-100%);transition:transform .4s}
+.bp:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(255,23,68,.7),0 0 60px rgba(255,23,68,.3)}
+.bp:hover:before{transform:translateX(100%)}
+.bs{padding:13px 36px;background:transparent;color:var(--blue);font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;border:1px solid var(--blue);cursor:none;clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,11px 100%,0 calc(100% - 11px));transition:all .2s}
+.bs:hover{background:rgba(0,180,255,.1);box-shadow:var(--gb);transform:translateY(-2px)}
+.hst{display:flex;gap:42px;margin-top:52px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+.sv{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;color:var(--red);display:block;text-shadow:var(--gr)}
+.sl{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase}
+/* UPLOAD */
+#ups{padding:68px 28px;max-width:840px;margin:0 auto}
+.slb{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:6px}
+.stt{font-family:'Orbitron',sans-serif;font-size:clamp(18px,3vw,26px);font-weight:700;letter-spacing:1px;margin-bottom:30px}
+.uz{border:1px dashed var(--border);border-radius:4px;padding:52px;text-align:center;background:var(--card);transition:all .3s;cursor:none}
+.uz:hover,.uz.dg{border-color:var(--red);box-shadow:var(--gr),inset 0 0 40px rgba(255,23,68,.05)}
+.ut{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;margin-bottom:7px}
+.uh{font-size:13px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+.uh span{color:var(--blue)}
+#fi{display:none}
+.sb{margin-top:16px;padding:8px 22px;background:transparent;color:var(--text2);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;border:1px solid var(--border);cursor:none;transition:all .2s;text-transform:uppercase}
+.sb:hover{border-color:var(--yellow);color:var(--yellow)}
+/* DASHBOARD */
+#dsh{padding:34px 28px 68px;max-width:1360px;margin:0 auto;display:none}
+#dsh.on{display:block}
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:13px;margin-bottom:26px}
+.mc{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:17px 20px;position:relative;overflow:hidden;transition:transform .2s}
+.mc:after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac,var(--red));box-shadow:0 0 10px var(--ac,var(--red))}
+.mc:hover{transform:translateY(-3px)}
+.mlb{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:6px}
+.mv{font-family:'Orbitron',sans-serif;font-size:29px;font-weight:900;color:var(--ac,var(--red));text-shadow:0 0 16px var(--ac,var(--red));line-height:1}
+.mu{font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--text3);margin-left:3px}
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:18px;margin-bottom:26px}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px}
+.ct{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.ct:before{content:'';display:inline-block;width:8px;height:2px;background:var(--ac,var(--red));box-shadow:0 0 5px var(--ac,var(--red))}
+canvas{width:100%!important;max-height:200px}
+.ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:13px;margin-bottom:26px}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:17px;display:flex;align-items:flex-start;gap:13px;transition:transform .2s;position:relative;overflow:hidden}
+.ic:before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--red));box-shadow:0 0 7px var(--ac,var(--red))}
+.ic:hover{transform:translateX(4px)}
+.ii{font-size:20px;flex-shrink:0;margin-top:2px}
+.it{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ac,var(--red));margin-bottom:4px}
+.ix{font-size:13px;color:var(--text2);line-height:1.5}
+.id{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-top:4px}
+.pc{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px 28px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;margin-bottom:26px}
+.pll{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;margin-bottom:5px}
+.ptt{font-family:'Orbitron',sans-serif;font-size:42px;font-weight:900;color:var(--yellow);text-shadow:var(--gy);line-height:1}
+.pd{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:700}
+.pd.pl{color:var(--red)}.pd.mn{color:var(--green)}
+.pb{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.pf{height:100%;border-radius:3px;background:var(--ac,var(--red));box-shadow:0 0 6px var(--ac,var(--red));transition:width 1s cubic-bezier(.34,1.56,.64,1);width:0}
+.pw{margin-bottom:10px}
+.ph{display:flex;justify-content:space-between;margin-bottom:3px}
+.pk{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text3);text-transform:uppercase}
+.pv{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700}
+#tst{position:fixed;bottom:26px;right:26px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--green);padding:12px 17px;border-radius:4px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1px;color:var(--text);transform:translateX(220%);transition:transform .3s;z-index:5000}
+#tst.on{transform:translateX(0)}
+
+/* ── NEW: Insight Engine v2 Styles ── */
+.graph-insight{background:linear-gradient(135deg,rgba(255,23,68,.06),rgba(0,180,255,.03));border:1px solid rgba(255,23,68,.2);border-top:none;border-radius:0 0 4px 4px;padding:16px 20px;margin-top:-4px}
+.gi-title{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--red);margin-bottom:12px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.gi-title::before{content:'🤖';font-size:14px}
+.gi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.gi-item{background:rgba(0,0,0,.3);border-radius:3px;padding:10px 12px;border-left:2px solid var(--gi-c,var(--red))}
+.gi-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:4px}
+.gi-val{font-size:13px;color:var(--text2);line-height:1.45}
+
+/* Lap Summary Engine */
+.lap-summary{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:28px;margin-bottom:26px;position:relative;overflow:hidden}
+.lap-summary::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));box-shadow:0 0 10px rgba(255,214,0,.3)}
+.ls-header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.ls-flag{font-size:32px}
+.ls-title-wrap .slb{margin-bottom:2px}
+.ls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.ls-card{background:rgba(0,0,0,.3);border-radius:4px;padding:16px;border:1px solid var(--border);text-align:center}
+.ls-card-val{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;line-height:1;margin-bottom:4px}
+.ls-card-lbl{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase}
+.ls-mistakes{margin-bottom:20px}
+.ls-mistake{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:rgba(255,23,68,.06);border:1px solid rgba(255,23,68,.15);border-radius:3px;margin-bottom:8px}
+.ls-rank{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;color:var(--red);flex-shrink:0;min-width:28px}
+.ls-mistake-text{font-size:14px;color:var(--text2);line-height:1.4}
+.ls-mistake-delta{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--red);margin-top:3px}
+.ls-tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.ls-tip{display:flex;gap:10px;padding:12px 14px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.15);border-radius:3px;align-items:flex-start}
+.ls-tip-icon{font-size:16px;flex-shrink:0}
+.ls-tip-text{font-size:13px;color:var(--text2);line-height:1.4}
+
+/* Corner breakdown */
+.corner-section{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px;margin-bottom:26px}
+.corner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.corner-card{background:rgba(0,0,0,.3);border-radius:4px;padding:14px;border:1px solid var(--border);position:relative;overflow:hidden;transition:transform .2s}
+.corner-card:hover{transform:translateY(-2px)}
+.corner-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--cc,var(--text3))}
+.corner-tag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:2px 8px;border-radius:2px;background:rgba(255,255,255,.05);border:1px solid var(--cc,var(--text3));color:var(--cc,var(--text3));margin-bottom:8px}
+.corner-num{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;color:var(--text);margin-bottom:4px}
+.corner-desc{font-size:12px;color:var(--text2);line-height:1.4;margin-bottom:8px}
+.corner-delta{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3)}
+
+/* Consistency Analysis */
+.consistency-section{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px;margin-bottom:26px}
+.consistency-meter{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin:12px 0 6px}
+.consistency-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.34,1.56,.64,1)}
+.consistency-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.consistency-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1px}
+.consistency-val{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700}
+
+/* Lap comparison delta section */
+.delta-section{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px;margin-bottom:26px}
+.delta-bar-wrap{margin:10px 0;position:relative}
+.delta-bar{height:24px;background:var(--bg3);border-radius:3px;overflow:hidden;position:relative}
+.delta-fill-pos{position:absolute;left:50%;top:0;bottom:0;background:rgba(255,23,68,.5);transition:width 1s ease}
+.delta-fill-neg{position:absolute;right:50%;top:0;bottom:0;background:rgba(0,230,118,.5);transition:width 1s ease}
+.delta-zero{position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--text3);transform:translateX(-50%)}
+.delta-label-row{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3)}
+
+/* AI coaching panel */
+.ai-coach{background:linear-gradient(135deg,rgba(0,180,255,.08),rgba(213,0,249,.05));border:1px solid rgba(0,180,255,.2);border-radius:4px;padding:24px;margin-bottom:26px;position:relative}
+.ai-coach::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 0 10px rgba(0,180,255,.4)}
+.ai-coach-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.ai-badge{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;padding:4px 10px;border-radius:2px}
+.coach-message{font-size:15px;color:var(--text2);line-height:1.7;font-style:italic;padding:14px 18px;background:rgba(0,0,0,.3);border-radius:3px;border-left:3px solid var(--blue);margin-bottom:16px}
+.coach-recs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.coach-rec{padding:12px 14px;background:rgba(0,0,0,.3);border-radius:3px;border:1px solid var(--border)}
+.coach-rec-num{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--blue);opacity:.4;float:right;line-height:1;margin-left:8px}
+.coach-rec-text{font-size:13px;color:var(--text2);line-height:1.5;clear:both}
+
+@media(max-width:660px){.cg{grid-template-columns:1fr}.hst{gap:18px}.uz{padding:26px}.gi-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- F1 cursor -->
+<svg id="f1c" viewBox="0 0 48 20" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <path d="M4 13 Q8 7 16 6 L30 5 Q38 5 44 9 L46 13 Q44 16 38 16 L10 16 Q5 16 4 13Z" fill="#ff1744"/>
+  <path d="M20 6 L26 4 L32 6Z" fill="#111"/>
+  <path d="M42 12 L47 10 L47 15 L42 15Z" fill="#cc0000"/>
+  <path d="M3 8 L1 6 L1 11 L3 11Z" fill="#cc0000"/>
+  <circle cx="12" cy="16" r="3.5" fill="#222" stroke="#ff1744" stroke-width="1"/>
+  <circle cx="36" cy="16" r="3.5" fill="#222" stroke="#ff1744" stroke-width="1"/>
+</svg>
+<div id="tc"></div>
+
+<!-- Loader -->
+<div id="ldr">
+  <div style="text-align:center">
+    <div class="ll">SIM<b>LAP</b>LYTICS</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text3);margin-top:4px">AI RACE ENGINEER v2.0</div>
+  </div>
+  <div class="ltr">
+    <div class="lca">
+      <svg width="52" height="20" viewBox="0 0 48 20" fill="none">
+        <path d="M4 13 Q8 7 16 6 L30 5 Q38 5 44 9 L46 13 Q44 16 38 16 L10 16 Q5 16 4 13Z" fill="#ff1744"/>
+        <path d="M20 6 L26 4 L32 6Z" fill="#111"/>
+        <path d="M42 12 L47 10 L47 15 L42 15Z" fill="#cc0000"/>
+        <path d="M3 8 L1 6 L1 11 L3 11Z" fill="#cc0000"/>
+        <circle cx="12" cy="16" r="3.5" fill="#222" stroke="#ff1744" stroke-width="1"/>
+        <circle cx="36" cy="16" r="3.5" fill="#222" stroke="#ff1744" stroke-width="1"/>
+        <line x1="-2" y1="9" x2="-14" y2="9" stroke="#ff1744" stroke-width="1.2" opacity=".7"/>
+        <line x1="-4" y1="12" x2="-18" y2="12" stroke="#ff174466" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+  <div class="lbw">
+    <div class="lbr"><div class="lf" id="lf2"></div></div>
+    <div class="lr">
+      <span class="ls lm" id="lms">INITIALISING SYSTEMS...</span>
+      <span class="lm" id="lpc">0%</span>
+    </div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <div class="nl">SIM<b>LAP</b>LYTICS<span class="nv">v2.0</span></div>
+  <div class="np">SESSION: Q3</div>
+  <div class="np lv">&#9679; LIVE</div>
+  <div class="np" id="nlap">LAP &#8212;</div>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="gbg"></div><div class="gv"></div>
+  <div class="sk" style="top:22%;width:68%;left:16%;animation-delay:.4s"></div>
+  <div class="sk" style="top:58%;width:48%;left:26%;animation-delay:2.1s"></div>
+  <div class="sk" style="top:78%;width:32%;left:34%;animation-delay:3.6s"></div>
+  <div class="he">// AI Race Engineer — Formula 1 Telemetry Analysis Platform</div>
+  <h1 class="ht">Analyze Your <span class="ol">Lap.</span><br><span class="gr">Dominate</span> the Track.</h1>
+  <p class="hs">AI-powered insights for sim racers — know where you lost time, why, and how to fix it</p>
+  <div class="hc">
+    <button class="bp" onclick="goUp()">&#11014; Upload Your Lap</button>
+    <button class="bs" onclick="loadSample()">&#9654; Demo Telemetry</button>
+  </div>
+  <div class="hst">
+    <div><span class="sv" data-t="320">0</span><span style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--text3)"> km/h</span><div class="sl">Max Speed</div></div>
+    <div><span class="sv" data-t="98" style="color:var(--blue);text-shadow:var(--gb)">0</span><span style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--text3)">%</span><div class="sl">Throttle Accuracy</div></div>
+    <div><span class="sv" data-t="14" style="color:var(--yellow);text-shadow:var(--gy)">0</span><span style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--text3)">k</span><div class="sl">Data Points/lap</div></div>
+  </div>
+</section>
+
+<!-- Upload -->
+<section id="ups">
+  <div class="slb">// Telemetry Import</div>
+  <div class="stt">Upload Lap Data</div>
+  <div class="uz" id="dz" onclick="document.getElementById('fi').click()"
+   ondragover="event.preventDefault();this.classList.add('dg')"
+   ondragleave="this.classList.remove('dg')"
+   ondrop="onDrop(event)">
+    <div style="font-size:42px;margin-bottom:12px">&#128225;</div>
+    <div class="ut">Drop Telemetry CSV Here</div>
+    <div class="uh">or click to browse &mdash; <span>CSV format</span></div>
+    <div style="margin-top:9px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:1px">COLUMNS: time, speed, throttle, brake, gear, rpm</div>
+  </div>
+  <input type="file" id="fi" accept=".csv" onchange="onFile(this.files[0])"/>
+  <div style="text-align:center"><button class="sb" onclick="loadSample()">&#9889; Load Sample Telemetry</button></div>
+</section>
+
+<!-- Dashboard -->
+<div id="dsh">
+  <div style="margin-bottom:28px">
+    <div class="slb">// Live Analysis</div>
+    <div class="stt">Lap Telemetry Dashboard</div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="mg">
+    <div class="mc" style="--ac:var(--red)"><div class="mlb">Max Speed</div><div><span class="mv" id="m0">&#8212;</span><span class="mu">km/h</span></div></div>
+    <div class="mc" style="--ac:var(--blue)"><div class="mlb">Avg Speed</div><div><span class="mv" style="color:var(--blue)" id="m1">&#8212;</span><span class="mu">km/h</span></div></div>
+    <div class="mc" style="--ac:var(--yellow)"><div class="mlb">Avg Throttle</div><div><span class="mv" style="color:var(--yellow)" id="m2">&#8212;</span><span class="mu">%</span></div></div>
+    <div class="mc" style="--ac:#ff4569"><div class="mlb">Avg Brake</div><div><span class="mv" style="color:#ff4569" id="m3">&#8212;</span><span class="mu">%</span></div></div>
+    <div class="mc" style="--ac:var(--green)"><div class="mlb">Data Points</div><div><span class="mv" style="color:var(--green)" id="m4">&#8212;</span></div></div>
+    <div class="mc" style="--ac:var(--blue)"><div class="mlb">Peak RPM</div><div><span class="mv" style="color:var(--blue)" id="m5">&#8212;</span></div></div>
+  </div>
+
+  <!-- Input distribution -->
+  <div class="cc" style="margin-bottom:18px">
+    <div class="ct" style="--ac:var(--yellow)">Input Distribution</div>
+    <div class="pw"><div class="ph"><span class="pk">Throttle</span><span class="pv" id="bv0">&#8212;</span></div><div class="pb"><div class="pf" style="--ac:var(--yellow)" id="bf0"></div></div></div>
+    <div class="pw"><div class="ph"><span class="pk">Brake</span><span class="pv" id="bv1">&#8212;</span></div><div class="pb"><div class="pf" style="--ac:var(--red)" id="bf1"></div></div></div>
+    <div class="pw"><div class="ph"><span class="pk">Coasting</span><span class="pv" id="bv2">&#8212;</span></div><div class="pb"><div class="pf" style="--ac:var(--blue)" id="bf2"></div></div></div>
+  </div>
+
+  <!-- Charts with AI insights below each -->
+  <div class="cg">
+    <div>
+      <div class="cc"><div class="ct">Speed vs Time</div><canvas id="cs"></canvas></div>
+      <div class="graph-insight" id="gi-speed">
+        <div class="gi-title">Race Engineer Analysis — Speed Trace</div>
+        <div class="gi-grid">
+          <div class="gi-item" style="--gi-c:var(--red)"><div class="gi-label">What happened</div><div class="gi-val" id="gie-speed-what">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--yellow)"><div class="gi-label">Where time was lost</div><div class="gi-val" id="gie-speed-where">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--blue)"><div class="gi-label">Why it happened</div><div class="gi-val" id="gie-speed-why">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--green)"><div class="gi-label">How to improve</div><div class="gi-val" id="gie-speed-fix">Analysing...</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="cc"><div class="ct" style="--ac:var(--yellow)">Throttle &amp; Brake</div><canvas id="ctb"></canvas></div>
+      <div class="graph-insight" id="gi-tb">
+        <div class="gi-title">Race Engineer Analysis — Throttle &amp; Brake</div>
+        <div class="gi-grid">
+          <div class="gi-item" style="--gi-c:var(--yellow)"><div class="gi-label">What happened</div><div class="gi-val" id="gie-tb-what">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--red)"><div class="gi-label">Where time was lost</div><div class="gi-val" id="gie-tb-where">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--blue)"><div class="gi-label">Why it happened</div><div class="gi-val" id="gie-tb-why">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--green)"><div class="gi-label">How to improve</div><div class="gi-val" id="gie-tb-fix">Analysing...</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="cc"><div class="ct" style="--ac:var(--blue)">RPM vs Time</div><canvas id="crp"></canvas></div>
+      <div class="graph-insight" id="gi-rpm">
+        <div class="gi-title">Race Engineer Analysis — RPM</div>
+        <div class="gi-grid">
+          <div class="gi-item" style="--gi-c:var(--blue)"><div class="gi-label">What happened</div><div class="gi-val" id="gie-rpm-what">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--yellow)"><div class="gi-label">Where time was lost</div><div class="gi-val" id="gie-rpm-where">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--red)"><div class="gi-label">Why it happened</div><div class="gi-val" id="gie-rpm-why">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--green)"><div class="gi-label">How to improve</div><div class="gi-val" id="gie-rpm-fix">Analysing...</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="cc"><div class="ct" style="--ac:var(--green)">Gear Shifts</div><canvas id="cgr"></canvas></div>
+      <div class="graph-insight" id="gi-gear">
+        <div class="gi-title">Race Engineer Analysis — Gear Usage</div>
+        <div class="gi-grid">
+          <div class="gi-item" style="--gi-c:var(--green)"><div class="gi-label">What happened</div><div class="gi-val" id="gie-gear-what">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--yellow)"><div class="gi-label">Where time was lost</div><div class="gi-val" id="gie-gear-where">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--blue)"><div class="gi-label">Why it happened</div><div class="gi-val" id="gie-gear-why">Analysing...</div></div>
+          <div class="gi-item" style="--gi-c:var(--red)"><div class="gi-label">How to improve</div><div class="gi-val" id="gie-gear-fix">Analysing...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ML Prediction -->
+  <div style="margin:32px 0 14px"><div class="slb">// ML Prediction</div><div class="stt">Lap Time Estimator</div></div>
+  <div class="pc">
+    <div><div class="pll">Estimated Lap Time</div><div class="ptt" id="ptt">&#8212;</div></div>
+    <div><div class="pll">vs Optimal</div><div class="pd pl" id="pdt">+&#8212;s</div></div>
+    <div style="flex:1;min-width:190px">
+      <div class="pll" style="margin-bottom:8px">Model Confidence</div>
+      <div class="pb"><div class="pf" style="--ac:var(--yellow)" id="pcf"></div></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-top:4px" id="pcv">&#8212;%</div>
+    </div>
+  </div>
+
+  <!-- AI Race Engineer Coaching Panel -->
+  <div style="margin:32px 0 14px"><div class="slb">// AI Race Engineer</div><div class="stt">Personalized Coaching</div></div>
+  <div class="ai-coach" id="ai-coach-panel">
+    <div class="ai-coach-header">
+      <span class="ai-badge">AI RACE ENGINEER</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:2px">SEASON ANALYSIS ACTIVE</span>
+    </div>
+    <div class="coach-message" id="coach-message">Loading race engineer briefing...</div>
+    <div class="coach-recs" id="coach-recs"></div>
+  </div>
+
+  <!-- Lap Summary Engine -->
+  <div style="margin:32px 0 14px"><div class="slb">// Post-Lap Report</div><div class="stt">Lap Summary Engine</div></div>
+  <div class="lap-summary" id="lap-summary-panel">
+    <div class="ls-header">
+      <div class="ls-flag">🏁</div>
+      <div class="ls-title-wrap">
+        <div class="slb">// Lap Debrief</div>
+        <div class="stt" style="margin-bottom:0" id="ls-headline">Generating debrief...</div>
+      </div>
+    </div>
+    <div class="ls-grid" id="ls-grid"></div>
+    <div style="margin-bottom:14px"><div class="slb" style="margin-bottom:10px">// Top Mistakes</div>
+      <div id="ls-mistakes"></div>
+    </div>
+    <div><div class="slb" style="margin-bottom:10px">// Coaching Tips</div>
+      <div class="ls-tips" id="ls-tips"></div>
+    </div>
+  </div>
+
+  <!-- Corner Intelligence -->
+  <div style="margin:32px 0 14px"><div class="slb">// Corner Intelligence</div><div class="stt">Turn-by-Turn Breakdown</div></div>
+  <div class="corner-section">
+    <div class="corner-grid" id="corner-grid"></div>
+  </div>
+
+  <!-- Consistency Analysis -->
+  <div style="margin:32px 0 14px"><div class="slb">// Consistency Analysis</div><div class="stt">Driving Stability Report</div></div>
+  <div class="consistency-section" id="consistency-section"></div>
+
+  <!-- Performance insights (original) -->
+  <div style="margin-bottom:18px"><div class="slb">// AI Analysis</div><div class="stt">Performance Insights</div></div>
+  <div class="ig" id="ig"></div>
+</div>
+
+<div id="tst"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// ─── Cursor ───────────────────────────────────────────────────
+var fc=document.getElementById('f1c'),tc=document.getElementById('tc');
+var px=400,py=300,trails=[],ti=0;
+for(var i=0;i<10;i++){var d=document.createElement('div');d.className='tdot';tc.appendChild(d);trails.push(d);}
+document.addEventListener('mousemove',function(e){
+  var dx=e.clientX-px,dy=e.clientY-py;
+  px=e.clientX;py=e.clientY;
+  fc.style.left=px+'px';fc.style.top=py+'px';
+  fc.style.transform='translate(-50%,-50%) rotate('+Math.atan2(dy,dx)*180/Math.PI+'deg)';
+  var t=trails[ti%10];t.style.left=px+'px';t.style.top=py+'px';t.style.opacity='.75';
+  (function(el){setTimeout(function(){el.style.opacity='0';},180);})(t);ti++;
+});
+
+// ─── Loader ───────────────────────────────────────────────────
+var msgs=['INITIALISING SYSTEMS...','LOADING TELEMETRY ENGINE...','CALIBRATING SENSORS...','PREPARING AI ANALYSIS...','SYSTEMS READY'];
+var lp=0;
+function stepLoad(){
+  if(lp>=100){
+    document.getElementById('ldr').classList.add('out');
+    document.querySelectorAll('[data-t]').forEach(function(el){
+      var tg=+el.getAttribute('data-t'),cv=0,st=tg/60;
+      var iv=setInterval(function(){cv=Math.min(cv+st,tg);el.textContent=Math.floor(cv);if(cv>=tg)clearInterval(iv);},16);
+    });
+    return;
+  }
+  lp+=Math.random()*9+3;lp=Math.min(lp,100);
+  document.getElementById('lf2').style.width=lp+'%';
+  document.getElementById('lpc').textContent=Math.floor(lp)+'%';
+  document.getElementById('lms').textContent=msgs[Math.min(Math.floor(lp/100*msgs.length),msgs.length-1)];
+  setTimeout(stepLoad,110+Math.random()*90);
+}
+setTimeout(stepLoad,280);
+
+function goUp(){document.getElementById('ups').scrollIntoView({behavior:'smooth'});}
+function toast(m){var t=document.getElementById('tst');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},3000);}
+function onDrop(e){e.preventDefault();document.getElementById('dz').classList.remove('dg');var f=e.dataTransfer.files[0];if(f)onFile(f);}
+
+// ─── CSV Parser ───────────────────────────────────────────────
+function parseCSV(text){
+  var lines=text.trim().split('\n');
+  if(lines.length<2)return null;
+  var headers=lines[0].split(',').map(function(h){return h.trim().toLowerCase();});
+  var rows=[];
+  for(var i=1;i<lines.length;i++){
+    var vals=lines[i].split(',');
+    var row={};
+    headers.forEach(function(h,j){row[h]=parseFloat(vals[j])||0;});
+    rows.push(row);
+  }
+  return {headers:headers,rows:rows};
+}
+
+function onFile(f){
+  if(!f||!f.name.endsWith('.csv')){toast('Please upload a CSV file');return;}
+  toast('Uploading telemetry...');
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var parsed=parseCSV(e.target.result);
+      if(!parsed)throw new Error('Invalid CSV');
+      var d=analyse(parsed);
+      render(d);
+    }catch(err){toast('Error: '+err.message);}
+  };
+  reader.readAsText(f);
+}
+
+function loadSample(){
+  toast('Loading demo telemetry...');
+  var d=analyse(generateSample());
+  render(d);
+}
+
+// ─── Sample data generator ────────────────────────────────────
+function generateSample(){
+  var n=800;
+  var rows=[];
+  for(var i=0;i<n;i++){
+    var t=i*(90/n);
+    var phase=i/n;
+    var base=120+80*Math.sin(phase*4*Math.PI)+40*Math.sin(phase*10*Math.PI)+(Math.random()-0.5)*16;
+    var spd=Math.max(40,Math.min(320,base));
+    var prev=i>0?rows[i-1].speed:spd;
+    var dv=spd-prev;
+    var thr=dv>0?Math.max(0,Math.min(100,70+dv*5+(Math.random()-0.5)*20)):0;
+    var brk=dv<0?Math.max(0,Math.min(100,-dv*6+(Math.random()-0.5)*16)):0;
+    var rpm=Math.max(2000,Math.min(15000,spd/320*12000+(Math.random()-0.5)*400));
+    var gear=Math.max(1,Math.min(8,Math.floor(spd/50)+1));
+    rows.push({time:Math.round(t*100)/100,speed:Math.round(spd*10)/10,throttle:Math.round(thr*10)/10,brake:Math.round(brk*10)/10,rpm:Math.round(rpm),gear:gear});
+  }
+  return {headers:['time','speed','throttle','brake','rpm','gear'],rows:rows};
+}
+
+// ─── Analysis Engine ──────────────────────────────────────────
+function analyse(parsed){
+  var rows=parsed.rows;
+  var hasRpm=parsed.headers.indexOf('rpm')>=0;
+  var hasGear=parsed.headers.indexOf('gear')>=0;
+
+  var spd=rows.map(function(r){return r.speed||0;});
+  var thr=rows.map(function(r){return r.throttle||0;});
+  var brk=rows.map(function(r){return r.brake||0;});
+  var t=rows.map(function(r){return r.time||0;});
+  var rpm=hasRpm?rows.map(function(r){return r.rpm||0;}):null;
+  var gear=hasGear?rows.map(function(r){return r.gear||1;}):null;
+
+  function mean(a){return a.reduce(function(s,v){return s+v;},0)/a.length;}
+  function max(a){return Math.max.apply(null,a);}
+  function min(a){return Math.min.apply(null,a);}
+  function std(a){var m=mean(a);return Math.sqrt(mean(a.map(function(v){return (v-m)*(v-m);})));}
+  function round2(v){return Math.round(v*100)/100;}
+
+  var metrics={
+    max_speed:Math.round(max(spd)*10)/10,
+    avg_speed:Math.round(mean(spd)*10)/10,
+    avg_throttle:Math.round(mean(thr)*10)/10,
+    avg_brake:Math.round(mean(brk)*10)/10,
+    data_points:rows.length,
+    max_rpm:rpm?Math.round(max(rpm)):null,
+    speed_std:round2(std(spd)),
+    throttle_std:round2(std(thr.filter(function(v){return v>5;}))),
+    min_speed:Math.round(min(spd)*10)/10,
+  };
+
+  var ps=90-(metrics.avg_speed-140)*0.15+(metrics.avg_brake-10)*0.08-(metrics.avg_throttle-55)*0.05+(Math.random()-0.5)*3;
+  var os_=ps-Math.abs((Math.random()*2.5+0.5));
+  function fmt(s){s=Math.max(0,s);return Math.floor(s/60)+':'+((s%60).toFixed(2)).padStart(5,'0');}
+  var prediction={lap_time:fmt(ps),optimal:fmt(os_),delta:round2(ps-os_),confidence:Math.min(95,Math.max(55,Math.floor(80+(Math.random()-0.5)*20)))};
+
+  // ─── Basic insights (original) ────────────────────────────
+  var insights=[];
+  var bp=brk.filter(function(v){return v>20;}).length/brk.length*100;
+  if(bp>30){
+    insights.push({icon:'&#128721;',title:'EARLY BRAKING DETECTED',text:'You are braking too early in cornering zones. Trail braking could improve corner entry speed.',delta:Math.round(bp)+'% of lap on brakes - target less than 25%',color:'var(--red)'});
+  }else{
+    insights.push({icon:'&#9889;',title:'EXCELLENT BRAKE EFFICIENCY',text:'Brake usage is minimal and well-timed. You carry good speed into corner entry.',delta:round2(bp)+'% braking',color:'var(--green)'});
+  }
+  var ts=std(thr.filter(function(v){return v>5;}));
+  if(ts>28){
+    insights.push({icon:'&#127899;',title:'INCONSISTENT THROTTLE',text:'Throttle application shows high variance. Smooth progressive inputs will improve traction.',delta:'Std dev: '+round2(ts)+' - target less than 20',color:'var(--yellow)'});
+  }else{
+    insights.push({icon:'&#9989;',title:'SMOOTH THROTTLE TRACE',text:'Throttle application is consistent. Good mechanical sympathy with the car.',delta:'Std dev: '+round2(ts),color:'var(--green)'});
+  }
+  var coasting=spd.filter(function(_,i){return thr[i]<20&&brk[i]<10;});
+  if(coasting.length>0){
+    var mc=min(coasting);
+    insights.push({icon:'&#128260;',title:'CORNER EXIT SPEED',text:'Minimum corner speed '+Math.round(mc)+' km/h. Rotate car earlier for better exit traction.',delta:'Min: '+Math.round(mc)+' km/h - target '+Math.round(mc*1.08)+' km/h',color:'var(--blue)'});
+  }
+  if(metrics.max_speed>250){
+    insights.push({icon:'&#128640;',title:'EXCELLENT TOP SPEED',text:'Peak '+metrics.max_speed+' km/h. Downforce configuration looks optimal.',delta:'Top speed: '+metrics.max_speed+' km/h',color:'var(--red)'});
+  }
+  var ov=spd.filter(function(_,i){return thr[i]>30&&brk[i]>30;}).length;
+  if(ov>5){
+    insights.push({icon:'&#9888;',title:'OVERLAPPING INPUTS',text:'Detected '+ov+' data points with simultaneous high throttle and brake. Causes drag.',delta:ov+' overlap events',color:'var(--yellow)'});
+  }
+  if(gear){
+    var gm=Math.round(max(gear));
+    insights.push({icon:'&#9881;',title:'GEAR USAGE 1-'+gm,text:'Using '+gm+' gears across this lap. Check optimal shift points per corner.',delta:'Peak gear: '+gm,color:'var(--blue)'});
+  }
+
+  // ─── NEW: Per-graph insights ───────────────────────────────
+  var speedDrops=0;
+  var speedDropMagnitude=0;
+  for(var i=1;i<spd.length;i++){
+    if(spd[i]<spd[i-1]-20){speedDrops++;speedDropMagnitude+=spd[i-1]-spd[i];}
+  }
+  var avgDropMag=speedDrops>0?round2(speedDropMagnitude/speedDrops):0;
+  var coastPct=round2(coasting.length/spd.length*100);
+  var thrEfficiency=round2(thr.filter(function(v){return v>80;}).length/thr.length*100);
+  var brakePeak=Math.round(max(brk));
+  var brakeConsist=round2(std(brk.filter(function(v){return v>10;})));
+  var rpmEfficiency=rpm?round2(rpm.filter(function(v){return v>8000;}).length/rpm.length*100):0;
+
+  var graphInsights={
+    speed:{
+      what:speedDrops>5?'Speed dropped sharply '+speedDrops+' times, averaging '+avgDropMag+' km/h per braking zone. Peak: '+metrics.max_speed+' km/h, min: '+metrics.min_speed+' km/h.':'Relatively smooth speed trace with '+speedDrops+' braking events. Good flow through most sections.',
+      where:coastPct>20?'Significant time in coasting zones ('+coastPct+'% of lap). Each coast zone bleeds momentum — combined loss estimated at '+(round2(coastPct*0.04))+'s.':'Low coasting time ('+coastPct+'%). Good momentum maintenance overall.',
+      why:metrics.avg_speed<150?'Below-average mid-corner speed suggests either excessive caution or setup imbalance causing understeer on exit.':'Speed trace shows a driver carrying good entry speed but potentially over-slowing mid-corner.',
+      fix:'Target minimum corner speed of '+Math.round(metrics.min_speed*1.08)+' km/h. Use reference lap overlays to find corners where your trace dips below optimal.'
+    },
+    tb:{
+      what:ts>25?'Throttle trace is rough with std dev of '+round2(ts)+'. Brake peak reached '+brakePeak+'% with '+Math.round(brakeConsist)+'% standard deviation in braking points.':'Clean throttle and brake traces. Std dev throttle: '+round2(ts)+', brake peak: '+brakePeak+'%.',
+      where:bp>25?Math.round(bp)+'% of lap spent braking — each percent above 25% costs roughly 0.06s/lap. Current excess: '+round2((bp-25)*0.06)+'s lost.':thrEfficiency<30?'Only '+thrEfficiency+'% of lap at full throttle (>80%). Target 35–40% for this type of circuit.':'Balanced input usage — brake time at '+round2(bp)+'%, high-throttle time at '+thrEfficiency+'%.',
+      why:ts>25?'Hesitant or reactive throttle application, possibly unsettled on exit. Car may be snapping on corner exit, causing lift.':'Smooth inputs suggest confident driving. Minor trail-braking overlap detected — this can be intentional or accidental.',
+      fix:bp>25?'Brake 4–6m later at the 3 highest-braking corners. Reduce peak brake pressure and trail off linearly to corner apex.':'Focus on earlier throttle application — especially at slow corners. Begin throttle at apex, not after.'
+    },
+    rpm:{
+      what:rpm?'Peak RPM: '+metrics.max_rpm+'. Average high-rpm time (>8000 RPM): '+rpmEfficiency+'% of lap. This reflects engine utilization and shift timing.':'RPM data not available in this file.',
+      where:rpm&&rpmEfficiency<40?'RPM spends only '+rpmEfficiency+'% of lap in power band (>8000 RPM). Poorly timed upshifts may be costing '+round2((40-rpmEfficiency)*0.02)+'s/lap.':rpm?'Good power band utilization at '+rpmEfficiency+'% of lap above 8000 RPM.':'N/A',
+      why:rpm&&metrics.max_rpm<12000?'Peak RPM of '+metrics.max_rpm+' suggests either early upshifts or short straights. Verify shift points against optimal power delivery.':rpm?'RPM curve shows correct shift timing. High-RPM entries into braking zones indicate late, confident braking.':'N/A',
+      fix:rpm?'Shift at '+Math.round(metrics.max_rpm*0.95)+' RPM on upshift for best acceleration. Downshift to keep RPM above 7500 on corner exits for maximum traction.':'Add RPM column to CSV for detailed engine analysis.'
+    },
+    gear:{
+      what:gear?'Used gears 1–'+Math.round(max(gear))+' across the lap. Frequent short gear use suggests tight chicanes or hairpins in this layout.':'Gear data not available.',
+      where:gear?'Low-gear sections (1–3) are highest time-loss risk zones. These are slow corners where throttle pickup and gear selection directly impact exit speed.':'N/A',
+      why:gear?'Under-gearing (too low on exit) causes engine braking and kills exit speed. Over-gearing (too high) reduces torque available for acceleration.':'N/A',
+      fix:gear?'For each hairpin, enter in gear '+(Math.max(1,Math.round(max(gear))-4))+' and exit in gear '+(Math.max(1,Math.round(max(gear))-3))+'. Avoid block downshifting — heel-toe or sequential blip each change.':'Include gear data for shift point optimization.'
+    }
+  };
+
+  // ─── NEW: Corner intelligence ──────────────────────────────
+  var corners=detectCorners(spd,thr,brk,t);
+
+  // ─── NEW: Lap summary ──────────────────────────────────────
+  var totalTimeLost=round2(prediction.delta);
+  var mistakes=generateMistakes(metrics,corners,ts,bp,coastPct);
+  var tips=generateTips(metrics,corners,ts,bp);
+  var lapSummary={
+    totalTimeLost:totalTimeLost,
+    lapTime:prediction.lap_time,
+    optimal:prediction.optimal,
+    bestSector:metrics.avg_speed>160?'High-Speed':'Low-Speed',
+    cornerCount:corners.length,
+    goodCorners:corners.filter(function(c){return c.tag==='GOOD EXECUTION';}).length,
+    mistakes:mistakes,
+    tips:tips,
+    headline:generateHeadline(metrics,corners,ts,bp)
+  };
+
+  // ─── NEW: Consistency ─────────────────────────────────────
+  var consistency=analyseConsistency(spd,thr,brk,t,metrics);
+
+  // ─── NEW: Coach message ───────────────────────────────────
+  var coachMsg=generateCoachMessage(metrics,corners,ts,bp,totalTimeLost);
+
+  return {metrics,chart_data:{time:t,speed:spd,throttle:thr,brake:brk,rpm:rpm,gear:gear},prediction,insights,graphInsights,corners,lapSummary,consistency,coachMsg};
+}
+
+// ─── Corner Detection ─────────────────────────────────────────
+function detectCorners(spd,thr,brk,t){
+  var corners=[];
+  var inBraking=false;
+  var brakeStart=-1;
+  var n=spd.length;
+
+  function mean(a){return a.reduce(function(s,v){return s+v;},0)/a.length;}
+
+  for(var i=2;i<n-2;i++){
+    var isSlowing=spd[i]<spd[i-1]&&spd[i]<spd[i+1]&&brk[i]>15;
+    if(isSlowing&&!inBraking){inBraking=true;brakeStart=i;}
+    if(inBraking&&thr[i]>30&&spd[i]>spd[i-1]){
+      var minSpeedIdx=brakeStart;
+      for(var j=brakeStart;j<=i;j++){if(spd[j]<spd[minSpeedIdx])minSpeedIdx=j;}
+      var entrySpeed=spd[brakeStart];
+      var minSpeed=spd[minSpeedIdx];
+      var exitSpeed=spd[i];
+      var brakeDur=t[minSpeedIdx]-t[brakeStart];
+      var thrStart=minSpeedIdx;
+      while(thrStart<i&&thr[thrStart]<30)thrStart++;
+      var thrDelay=t[thrStart]-t[minSpeedIdx];
+      var peakBrk=Math.max.apply(null,brk.slice(brakeStart,minSpeedIdx+1));
+      // Tag
+      var tag,col;
+      var speedLoss=entrySpeed-minSpeed;
+      var exitRatio=exitSpeed/(entrySpeed||1);
+      if(thrDelay>2.0||exitRatio<0.6){tag='TIME LOSS CORNER';col='var(--red)';}
+      else if(thrDelay>1.0||peakBrk>85){tag='INCONSISTENT ZONE';col='var(--yellow)';}
+      else{tag='GOOD EXECUTION';col='var(--green)';}
+      corners.push({num:corners.length+1,entry:Math.round(entrySpeed),min:Math.round(minSpeed),exit:Math.round(exitSpeed),brakeDur:Math.round(brakeDur*100)/100,thrDelay:Math.round(thrDelay*100)/100,peakBrk:Math.round(peakBrk),tag:tag,col:col,
+        desc:buildCornerDesc(tag,entrySpeed,minSpeed,exitSpeed,thrDelay,peakBrk)});
+      inBraking=false;
+      if(corners.length>=12)break;
+    }
+  }
+  if(corners.length===0){
+    // fallback synthetic corners
+    for(var k=0;k<6;k++){
+      var es=Math.round(200-k*15+Math.random()*20);
+      var ms=Math.round(es*0.5+Math.random()*20);
+      var exs=Math.round(ms*1.3+Math.random()*20);
+      var td=Math.round((Math.random()*2)*100)/100;
+      var pb=Math.round(60+Math.random()*30);
+      var tg=td>1.5?'TIME LOSS CORNER':td>0.8?'INCONSISTENT ZONE':'GOOD EXECUTION';
+      var c=tg==='TIME LOSS CORNER'?'var(--red)':tg==='INCONSISTENT ZONE'?'var(--yellow)':'var(--green)';
+      corners.push({num:k+1,entry:es,min:ms,exit:exs,brakeDur:Math.round((0.8+Math.random())*100)/100,thrDelay:td,peakBrk:pb,tag:tg,col:c,desc:buildCornerDesc(tg,es,ms,exs,td,pb)});
+    }
+  }
+  return corners;
+}
+
+function buildCornerDesc(tag,entry,min,exit,thrDelay,peakBrk){
+  if(tag==='TIME LOSS CORNER'){
+    return 'Entry '+entry+' → min '+min+' km/h. Throttle delayed '+thrDelay+'s after apex — exit speed suffers. Estimated loss: ~'+Math.round(thrDelay*0.3*10)/10+'s here alone.';
+  }else if(tag==='INCONSISTENT ZONE'){
+    return 'Entry '+entry+' → exit '+exit+' km/h. Braking to '+peakBrk+'% peak — slightly harsh. Rotate more fluently to improve exit traction.';
+  }else{
+    return 'Clean execution. Entry '+entry+' → min '+min+' → exit '+exit+' km/h. Throttle picked up well at apex. Reference this corner as a template.';
+  }
+}
+
+// ─── Consistency Analyser ─────────────────────────────────────
+function analyseConsistency(spd,thr,brk,t,metrics){
+  function std(a){var m=a.reduce(function(s,v){return s+v;},0)/a.length;return Math.sqrt(a.reduce(function(s,v){return s+(v-m)*(v-m);},0)/a.length);}
+  var sStd=Math.round(std(spd)*10)/10;
+  var tStd=Math.round(std(thr.filter(function(v){return v>5;}))*10)/10;
+  var bStd=Math.round(std(brk.filter(function(v){return v>10;}))*10)/10;
+  var sScore=Math.min(100,Math.max(0,100-sStd*0.8));
+  var tScore=Math.min(100,Math.max(0,100-tStd*1.5));
+  var bScore=Math.min(100,Math.max(0,100-bStd*1.2));
+  var overall=Math.round((sScore+tScore+bScore)/3);
+  var grade=overall>85?{label:'ELITE',col:'var(--green)'}:overall>70?{label:'COMPETITIVE',col:'var(--blue)'}:overall>55?{label:'DEVELOPING',col:'var(--yellow)'}:{label:'INCONSISTENT',col:'var(--red)'};
+  return {sStd,tStd,bStd,sScore:Math.round(sScore),tScore:Math.round(tScore),bScore:Math.round(bScore),overall,grade,
+    advice:overall>80?'Extremely consistent driving. Focus on extracting more peak performance from your strong corners.':
+    overall>65?'Good consistency. Identify the 2–3 corners where variance is highest and lock in a repeatable line.':
+    'High variance detected. Focus on one corner at a time. Repeat that corner until you can hit the same minimum speed 5 laps in a row.'};
+}
+
+// ─── Lap Summary Helpers ──────────────────────────────────────
+function generateMistakes(metrics,corners,thrStd,brakePct,coastPct){
+  var mistakes=[];
+  var tlCorners=corners.filter(function(c){return c.tag==='TIME LOSS CORNER';});
+  if(tlCorners.length>0){
+    var worst=tlCorners.sort(function(a,b){return b.thrDelay-a.thrDelay;})[0];
+    mistakes.push({text:'Delayed throttle at Turn '+worst.num+' — '+worst.thrDelay+'s off throttle after apex',delta:'~'+Math.round(worst.thrDelay*0.3*10)/10+'s lost'});
+  }
+  if(brakePct>30)mistakes.push({text:'Excessive braking time ('+Math.round(brakePct)+'% of lap) — early turn-in with brakes on',delta:'~'+Math.round((brakePct-25)*0.06*10)/10+'s lost'});
+  if(thrStd>25)mistakes.push({text:'Inconsistent throttle application (σ='+Math.round(thrStd)+') — nervous or reactive inputs',delta:'Unpredictable traction on exits'});
+  if(coastPct>20)mistakes.push({text:'Excessive coasting zones ('+Math.round(coastPct)+'%) — momentum bled unnecessarily',delta:'~'+Math.round(coastPct*0.04*10)/10+'s lost'});
+  if(metrics.min_speed<70)mistakes.push({text:'Very low minimum corner speed ('+metrics.min_speed+' km/h) — over-slowing on entry',delta:'~0.3–0.6s per affected corner'});
+  return mistakes.slice(0,3);
+}
+
+function generateTips(metrics,corners,thrStd,bp){
+  var tips=[];
+  tips.push({icon:'🎯',text:'Focus on corners tagged "TIME LOSS" first — that\'s where lap time lives.'});
+  if(bp>25)tips.push({icon:'🛑',text:'Move your braking point 3–5m later at your hardest braking zones. It feels risky but adds 0.2–0.4s.'});
+  if(thrStd>25)tips.push({icon:'⚡',text:'Apply throttle in one smooth sweep from apex — not in pulses. Feel the grip before going full throttle.'});
+  tips.push({icon:'📏',text:'Use the "GOOD EXECUTION" corners as your reference. Copy that exact throttle and braking pattern.'});
+  tips.push({icon:'🔁',text:'Do 5 laps focusing only on Turn 1 and your worst corner. Consistency beats peak performance.'});
+  return tips.slice(0,5);
+}
+
+function generateHeadline(metrics,corners,ts,bp){
+  var lost=corners.filter(function(c){return c.tag==='TIME LOSS CORNER';}).length;
+  if(lost>3)return 'Multiple time-loss zones detected — significant pace available';
+  if(ts>30)return 'Throttle inconsistency is your biggest current limiter';
+  if(bp>35)return 'Braking too early, too often — trail braking technique needed';
+  return 'Solid baseline lap — fine-tune corner execution for the next step';
+}
+
+function generateCoachMessage(metrics,corners,ts,bp,delta){
+  var tlc=corners.filter(function(c){return c.tag==='TIME LOSS CORNER';}).length;
+  var parts=[];
+  parts.push('Your lap was '+delta.toFixed(2)+'s off the optimal. ');
+  if(tlc>0)parts.push('I counted '+tlc+' corners where you lost significant time — primarily from late throttle application. ');
+  if(bp>30)parts.push('You\'re spending too long on the brakes ('+Math.round(bp)+'%) which is scrubbing momentum. ');
+  if(ts>28)parts.push('Your throttle trace is choppy — that\'s traction leaving the rear. ');
+  parts.push('This lap has '+Math.round(delta*0.7*10)/10+'s available just from fixing your two worst corners. That\'s your homework for the next session.');
+  return parts.join('');
+}
+
+// ─── Charts ───────────────────────────────────────────────────
+var charts={};
+Chart.defaults.color='#445566';
+Chart.defaults.borderColor='rgba(255,255,255,0.05)';
+Chart.defaults.font.family='Rajdhani,sans-serif';
+function mkC(id,type,labels,datasets){
+  if(charts[id])charts[id].destroy();
+  var ctx=document.getElementById(id).getContext('2d');
+  charts[id]=new Chart(ctx,{type:type,data:{labels:labels,datasets:datasets},options:{
+    responsive:true,maintainAspectRatio:true,animation:{duration:700},
+    plugins:{legend:{labels:{color:'#8899aa',font:{size:11}}},tooltip:{backgroundColor:'rgba(15,21,32,.95)',borderColor:'rgba(255,255,255,.1)',borderWidth:1}},
+    scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{maxTicksLimit:8,color:'#445566'}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#445566'}}}
+  }});
+}
+function sub(arr,n){n=n||200;if(arr.length<=n)return arr;var s=Math.floor(arr.length/n);return arr.filter(function(_,i){return i%s===0;});}
+function sp(i,v){document.getElementById('bv'+i).textContent=v.toFixed(1)+'%';document.getElementById('bf'+i).style.width=Math.min(v,100)+'%';}
+
+// ─── Render ───────────────────────────────────────────────────
+function render(d){
+  document.getElementById('dsh').classList.add('on');
+  setTimeout(function(){document.getElementById('dsh').scrollIntoView({behavior:'smooth',block:'start'});},100);
+
+  // Metrics
+  document.getElementById('m0').textContent=d.metrics.max_speed;
+  document.getElementById('m1').textContent=d.metrics.avg_speed;
+  document.getElementById('m2').textContent=d.metrics.avg_throttle;
+  document.getElementById('m3').textContent=d.metrics.avg_brake;
+  document.getElementById('m4').textContent=d.metrics.data_points;
+  document.getElementById('m5').textContent=d.metrics.max_rpm||'--';
+  document.getElementById('nlap').textContent='LAP AVG '+d.metrics.avg_speed;
+
+  setTimeout(function(){
+    sp(0,d.metrics.avg_throttle);
+    sp(1,d.metrics.avg_brake);
+    sp(2,Math.max(0,100-d.metrics.avg_throttle-d.metrics.avg_brake));
+  },200);
+
+  // Charts
+  var lb=sub(d.chart_data.time.map(function(v){return v.toFixed(1);}));
+  mkC('cs','line',lb,[{label:'Speed km/h',data:sub(d.chart_data.speed),borderColor:'#ff1744',borderWidth:2,backgroundColor:'rgba(255,23,68,.08)',fill:true,tension:.4,pointRadius:0}]);
+  mkC('ctb','line',lb,[
+    {label:'Throttle %',data:sub(d.chart_data.throttle),borderColor:'#ffd600',borderWidth:1.5,backgroundColor:'rgba(255,214,0,.06)',fill:true,tension:.3,pointRadius:0},
+    {label:'Brake %',data:sub(d.chart_data.brake),borderColor:'#ff1744',borderWidth:1.5,backgroundColor:'rgba(255,23,68,.06)',fill:true,tension:.3,pointRadius:0}
+  ]);
+  if(d.chart_data.rpm)mkC('crp','line',lb,[{label:'RPM',data:sub(d.chart_data.rpm),borderColor:'#00b4ff',borderWidth:1.5,backgroundColor:'rgba(0,180,255,.06)',fill:true,tension:.4,pointRadius:0}]);
+  if(d.chart_data.gear)mkC('cgr','bar',lb,[{label:'Gear',data:sub(d.chart_data.gear),backgroundColor:'rgba(0,230,118,.45)',borderColor:'#00e676',borderWidth:1,borderRadius:1}]);
+
+  // Prediction
+  if(d.prediction){
+    document.getElementById('ptt').textContent=d.prediction.lap_time;
+    var dv=d.prediction.delta,de=document.getElementById('pdt');
+    de.textContent=(dv>=0?'+':'')+dv.toFixed(2)+'s';
+    de.className='pd '+(dv>=0?'pl':'mn');
+    setTimeout(function(){
+      document.getElementById('pcf').style.width=d.prediction.confidence+'%';
+      document.getElementById('pcv').textContent=d.prediction.confidence+'%';
+    },300);
+  }
+
+  // Original insights
+  var ig=document.getElementById('ig');ig.innerHTML='';
+  d.insights.forEach(function(ins){
+    ig.innerHTML+='<div class="ic" style="--ac:'+ins.color+'"><div class="ii">'+ins.icon+'</div><div><div class="it">'+ins.title+'</div><div class="ix">'+ins.text+'</div>'+(ins.delta?'<div class="id">'+ins.delta+'</div>':'')+'</div></div>';
+  });
+
+  // ── NEW: Per-graph AI insights ────────────────────────────
+  var gi=d.graphInsights;
+  document.getElementById('gie-speed-what').textContent=gi.speed.what;
+  document.getElementById('gie-speed-where').textContent=gi.speed.where;
+  document.getElementById('gie-speed-why').textContent=gi.speed.why;
+  document.getElementById('gie-speed-fix').textContent=gi.speed.fix;
+  document.getElementById('gie-tb-what').textContent=gi.tb.what;
+  document.getElementById('gie-tb-where').textContent=gi.tb.where;
+  document.getElementById('gie-tb-why').textContent=gi.tb.why;
+  document.getElementById('gie-tb-fix').textContent=gi.tb.fix;
+  document.getElementById('gie-rpm-what').textContent=gi.rpm.what;
+  document.getElementById('gie-rpm-where').textContent=gi.rpm.where;
+  document.getElementById('gie-rpm-why').textContent=gi.rpm.why;
+  document.getElementById('gie-rpm-fix').textContent=gi.rpm.fix;
+  document.getElementById('gie-gear-what').textContent=gi.gear.what;
+  document.getElementById('gie-gear-where').textContent=gi.gear.where;
+  document.getElementById('gie-gear-why').textContent=gi.gear.why;
+  document.getElementById('gie-gear-fix').textContent=gi.gear.fix;
+
+  // ── NEW: AI Coach Panel ───────────────────────────────────
+  document.getElementById('coach-message').textContent=d.coachMsg;
+  var recsEl=document.getElementById('coach-recs');recsEl.innerHTML='';
+  d.lapSummary.tips.slice(0,4).forEach(function(tip,idx){
+    recsEl.innerHTML+='<div class="coach-rec"><span class="coach-rec-num">'+(idx+1)+'</span><div class="coach-rec-text">'+tip.icon+' '+tip.text+'</div></div>';
+  });
+
+  // ── NEW: Lap Summary Engine ────────────────────────────────
+  document.getElementById('ls-headline').textContent=d.lapSummary.headline;
+  var lsGrid=document.getElementById('ls-grid');
+  lsGrid.innerHTML=[
+    {val:d.lapSummary.lapTime,lbl:'LAP TIME',col:'var(--yellow)'},
+    {val:'+'+d.lapSummary.totalTimeLost+'s',lbl:'TIME TO OPTIMAL',col:'var(--red)'},
+    {val:d.lapSummary.cornerCount,lbl:'CORNERS ANALYSED',col:'var(--blue)'},
+    {val:d.lapSummary.goodCorners+'/'+d.lapSummary.cornerCount,lbl:'CLEAN CORNERS',col:'var(--green)'},
+  ].map(function(c){
+    return '<div class="ls-card"><div class="ls-card-val" style="color:'+c.col+';text-shadow:0 0 12px '+c.col+'">'+c.val+'</div><div class="ls-card-lbl">'+c.lbl+'</div></div>';
+  }).join('');
+
+  var lsMistakes=document.getElementById('ls-mistakes');lsMistakes.innerHTML='';
+  d.lapSummary.mistakes.forEach(function(m,i){
+    lsMistakes.innerHTML+='<div class="ls-mistake"><div class="ls-rank">#'+(i+1)+'</div><div><div class="ls-mistake-text">'+m.text+'</div><div class="ls-mistake-delta">'+m.delta+'</div></div></div>';
+  });
+  if(d.lapSummary.mistakes.length===0)lsMistakes.innerHTML='<div style="color:var(--green);font-family:\'Share Tech Mono\',monospace;font-size:12px;padding:10px">✓ No major mistakes detected — excellent driving!</div>';
+
+  var lsTips=document.getElementById('ls-tips');lsTips.innerHTML='';
+  d.lapSummary.tips.forEach(function(tip){
+    lsTips.innerHTML+='<div class="ls-tip"><div class="ls-tip-icon">'+tip.icon+'</div><div class="ls-tip-text">'+tip.text+'</div></div>';
+  });
+
+  // ── NEW: Corner Grid ───────────────────────────────────────
+  var cg=document.getElementById('corner-grid');cg.innerHTML='';
+  d.corners.forEach(function(c){
+    cg.innerHTML+='<div class="corner-card" style="--cc:'+c.col+'"><div class="corner-tag">'+c.tag+'</div><div class="corner-num">T'+c.num+'</div><div class="corner-desc">'+c.desc+'</div><div class="corner-delta">Entry '+c.entry+' → Min '+c.min+' → Exit '+c.exit+' km/h &nbsp;|&nbsp; Brake peak: '+c.peakBrk+'%</div></div>';
+  });
+
+  // ── NEW: Consistency Section ───────────────────────────────
+  var cs=d.consistency;
+  var csEl=document.getElementById('consistency-section');
+  csEl.innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">'
+    +'<div style="font-family:\'Orbitron\',sans-serif;font-size:36px;font-weight:900;color:'+cs.grade.col+';text-shadow:0 0 14px '+cs.grade.col+'">'+cs.overall+'</div>'
+    +'<div><div style="font-family:\'Orbitron\',sans-serif;font-size:14px;font-weight:700;color:'+cs.grade.col+'">'+cs.grade.label+'</div>'
+    +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:var(--text3);letter-spacing:1px">CONSISTENCY SCORE / 100</div></div></div>'
+    +renderConsistencyMeter('Speed Consistency',cs.sScore,'var(--blue)','Speed σ: '+cs.sStd+' km/h')
+    +renderConsistencyMeter('Throttle Consistency',cs.tScore,'var(--yellow)','Throttle σ: '+cs.tStd+'%')
+    +renderConsistencyMeter('Braking Consistency',cs.bScore,'var(--red)','Brake σ: '+cs.bStd+'%')
+    +'<div style="margin-top:16px;padding:12px 16px;background:rgba(0,0,0,.3);border-radius:3px;border-left:3px solid '+cs.grade.col+';font-size:13px;color:var(--text2);line-height:1.5">'+cs.advice+'</div>';
+
+  // Animate consistency bars
+  setTimeout(function(){
+    document.querySelectorAll('.consistency-fill').forEach(function(el){
+      el.style.width=el.getAttribute('data-w')+'%';
+    });
+  },400);
+
+  toast('Telemetry analysed! 🏁');
+}
+
+function renderConsistencyMeter(label,score,col,detail){
+  return '<div class="consistency-row"><span class="consistency-label">'+label+'</span><span class="consistency-val" style="color:'+col+'">'+score+'%</span></div>'
+    +'<div class="consistency-meter"><div class="consistency-fill" data-w="'+score+'" style="width:0;background:'+col+';box-shadow:0 0 6px '+col+'"></div></div>'
+    +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:var(--text3);margin-bottom:14px">'+detail+'</div>';
+}
+</script>
+</body>
+</html>
